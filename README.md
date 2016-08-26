@@ -29,7 +29,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 * Use git to clone the esp-open-rtos project (note the `--recursive`):
 
 ```
-git clone --recursive https://github.com/Superhouse/esp-open-rtos.git
+git clone --recursive https://github.com/OurAirQuality/esp-open-rtos.git
 cd esp-open-rtos
 ```
 
