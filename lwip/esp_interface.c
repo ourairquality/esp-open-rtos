@@ -37,6 +37,7 @@
  * Original Author: Simon Goldschmidt
  * Modified by Angus Gratton based on work by @kadamski/Espressif via esp-lwip project.
  */
+#include <string.h>
 #include "lwip/opt.h"
 
 #include "lwip/def.h"
@@ -45,6 +46,7 @@
 #include <lwip/stats.h>
 #include <lwip/snmp.h>
 #include "netif/etharp.h"
+#include "sysparam.h"
 
 /* declared in libnet80211.a */
 int8_t sdk_ieee80211_output_pbuf(struct netif *ifp, struct pbuf* pb);
@@ -54,9 +56,15 @@ low_level_output(struct netif *netif, struct pbuf *p)
 {
   struct pbuf *q;
 
-  for(q = p; q != NULL; q = q->next) {
-      sdk_ieee80211_output_pbuf(netif, q);
+  if (p->next) {
+      q = pbuf_clone(PBUF_RAW, PBUF_RAM, p);
+      if (q == NULL) {
+          return ERR_MEM;
+      }
+      p = q;
   }
+
+  sdk_ieee80211_output_pbuf(netif, p);
 
   LINK_STATS_INC(link.xmit);
 
@@ -70,7 +78,13 @@ err_t ethernetif_init(struct netif *netif)
 
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
-  netif->hostname = "lwip";
+  char *hostname = NULL;
+  sysparam_get_string("hostname", &hostname);
+  if (hostname && strlen(hostname) == 0) {
+      free(hostname);
+      hostname = NULL;
+  }
+  netif->hostname = hostname;
 #endif /* LWIP_NETIF_HOSTNAME */
 
   /*
@@ -88,7 +102,7 @@ err_t ethernetif_init(struct netif *netif)
 
   /* low_level_init components */
   netif->hwaddr_len = 6;
-  /* hwaddr seems to be set elsewhere, or (more likely) is set on tx by MAC layer */
+  /* The hwaddr is set by sdk_wifi_station_start or sdk_wifi_softap_start. */
   netif->mtu = 1500;
   netif->flags = NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
 
@@ -120,5 +134,27 @@ void ethernetif_input(struct netif *netif, struct pbuf *p)
 	pbuf_free(p);
 	p = NULL;
 	break;
+    }
+}
+
+/* Since the pbuf_type definition has changed in lwip v2 and it is used by the
+ * sdk when calling pbuf_alloc, the SDK libraries have been modified to rename
+ * their references to pbuf_alloc to _pbufalloc allowing the pbuf_type to be
+ * rewritten here. Doing this here keeps this hack out of the lwip code, and
+ * ensures that this re-writing is only applied to the sdk calls to pbuf_alloc.
+ *
+ * The only pbuf types used by the SDK are type 0 for PBUF_RAM when writing
+ * data, and type 2 for the received data. The receive data path references
+ * internal buffer objects that need to be freed with custom code so a custom
+ * pbuf allocation type is used for these.
+ */
+struct pbuf *_pbufalloc(pbuf_layer l, u16_t length, pbuf_type type) {
+    if (type == 0) {
+        return pbuf_alloc(l, length, PBUF_RAM);
+    } else if (type == 2) {
+        return pbuf_alloc_reference(NULL, length, PBUF_ALLOC_FLAG_RX | PBUF_TYPE_ALLOC_SRC_MASK_ESP_RX);
+    } else {
+        LWIP_ASSERT("Unexpected pbuf_alloc type", 0);
+        for (;;);
     }
 }

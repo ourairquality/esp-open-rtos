@@ -14,10 +14,9 @@ void IRAM sdk_ieee80211_deliver_data(struct sdk_g_ic_netif_info *netif_info, str
 
     if (netif->flags & NETIF_FLAG_LINK_UP) {
         uint16_t length = esf_buf->length;
-        struct pbuf *pbuf = pbuf_alloc(PBUF_RAW, length, PBUF_REF);
-        pbuf->payload = esf_buf->pbuf2->payload;
+        struct pbuf *pbuf = pbuf_alloc_reference(esf_buf->pbuf2->payload, length, PBUF_ALLOC_FLAG_RX | PBUF_TYPE_ALLOC_SRC_MASK_ESP_RX);
         esf_buf->pbuf1 = pbuf;
-        pbuf->eb = (void *)esf_buf;
+        pbuf->esf_buf = (void *)esf_buf;
         ethernetif_input(netif, pbuf);
         return;
     }

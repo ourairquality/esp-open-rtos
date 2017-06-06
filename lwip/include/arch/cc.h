@@ -52,17 +52,6 @@
 
 #define ERRNO
 
-#define BYTE_ORDER LITTLE_ENDIAN
-
-/** @todo fix some warnings: don't use #pragma if compiling with cygwin gcc */
-#ifndef __GNUC__
-	#include <limits.h>
-	#pragma warning (disable: 4244) /* disable conversion warning (implicit integer promotion!) */
-	#pragma warning (disable: 4127) /* conditional expression is constant */
-	#pragma warning (disable: 4996) /* 'strncpy' was declared deprecated */
-	#pragma warning (disable: 4103) /* structure packing changed by including file */
-#endif
-
 /* Define generic types used in lwIP */
 typedef uint8_t    u8_t;
 typedef int8_t    s8_t;
@@ -111,5 +100,7 @@ typedef int sys_prot_t;
 
 #define LWIP_PLATFORM_HTONS(_n)  ((u16_t)((((_n) & 0xff) << 8) | (((_n) >> 8) & 0xff)))
 #define LWIP_PLATFORM_HTONL(_n)  ((u32_t)( (((_n) & 0xff) << 24) | (((_n) & 0xff00) << 8) | (((_n) >> 8)  & 0xff00) | (((_n) >> 24) & 0xff) ))
+
+#define LWIP_RAND()                         rand()
 
 #endif /* __ARCH_CC_H__ */

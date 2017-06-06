@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-struct ip_addr;
+struct ip4_addr;
 
 /*********************************************
 * Defined in libmain.a
@@ -45,7 +45,7 @@ void sdk_os_putc(char c);
 
 /* Called when an IP gets set on the "station" (client) interface.
  */
-void sdk_system_station_got_ip_set(struct ip_addr *ip_addr, struct ip_addr *sn_mask, struct ip_addr *gw_addr);
+void sdk_system_station_got_ip_set(struct ip4_addr *ip_addr, struct ip4_addr *sn_mask, struct ip4_addr *gw_addr);
 
 /* This is a no-op wrapper around ppRecycleRxPkt, which is defined in libpp.a
 
