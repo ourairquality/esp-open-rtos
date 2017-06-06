@@ -28,3 +28,6 @@
 [submodule "extras/crc_generic/crc_lib"]
 	path = extras/crc_generic/crc_lib
 	url = https://github.com/Zaltora/crc_generic_lib.git
+[submodule "examples/oaq"]
+	path = examples/oaq
+	url = https://github.com/ourairquality/oaq-esp-open-rtos.git
