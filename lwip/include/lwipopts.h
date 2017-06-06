@@ -32,11 +32,13 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
-#define LWIP_ESP                            1
-#define ESP_RTOS                            1
-#define PBUF_RSV_FOR_WLAN                   1
-#define EBUF_LWIP                           1
+#define ESP_OPEN_RTOS                       1
+
+/* See tcp.c tcp_alloc(). */
 #define ESP_TIMEWAIT_THRESHOLD              10000
+
+/** LWIP_TIMEVAL_PRIVATE: if you want to use the struct timeval provided
+ * by your system, set this to 0 and include <sys/time.h> in cc.h */
 #define LWIP_TIMEVAL_PRIVATE                0
 
 /*
@@ -76,16 +78,20 @@
 #define MEM_LIBC_MALLOC        1
 
 /**
-* MEMP_MEM_MALLOC==1: Use mem_malloc/mem_free instead of the lwip pool allocator.
-* Especially useful with MEM_LIBC_MALLOC but handle with care regarding execution
-* speed and usage from interrupts!
-*/
+ * MEMP_MEM_MALLOC==1: Use mem_malloc/mem_free instead of the lwip pool allocator.
+ * Especially useful with MEM_LIBC_MALLOC but handle with care regarding execution
+ * speed (heap alloc can be much slower than pool alloc) and usage from interrupts
+ * (especially if your netif driver allocates PBUF_POOL pbufs for received frames
+ * from interrupt)!
+ * ATTENTION: Currently, this uses the heap for ALL pools (also for private pools,
+ * not only for internal pools defined in memp_std.h)!
+ */
 #define MEMP_MEM_MALLOC                 1
 
 /**
  * MEM_ALIGNMENT: should be set to the alignment of the CPU
- *    4 byte alignment -> #define MEM_ALIGNMENT 4
- *    2 byte alignment -> #define MEM_ALIGNMENT 2
+ *    4 byte alignment -> \#define MEM_ALIGNMENT 4
+ *    2 byte alignment -> \#define MEM_ALIGNMENT 2
  */
 #define MEM_ALIGNMENT           4
 
@@ -174,12 +180,12 @@
 */
 /*
    ----------------------------------
-   ---------- SNMP options ----------
+   ----- SNMP MIB2 support      -----
    ----------------------------------
 */
 /*
    ----------------------------------
-   ---------- IGMP options ----------
+   ----- Multicast/IGMP options -----
    ----------------------------------
 */
 /*
@@ -193,7 +199,10 @@
  */
 #define LWIP_DNS                        1
 
+/** DNS maximum number of entries to maintain locally. */
 #define DNS_TABLE_SIZE 1
+
+/** DNS maximum host name length supported in the name table. */
 #define DNS_MAX_NAME_LENGTH 128
 
 /*
@@ -207,29 +216,29 @@
    ---------------------------------
 */
 /**
- * TCP_QUEUE_OOSEQ==1: TCP will queue segments that arrive out of order.
- * Define to 0 if your device is low on memory.
- */
-#define TCP_QUEUE_OOSEQ                 0
-
-/*
- *     LWIP_EVENT_API==1: The user defines lwip_tcp_event() to receive all
- *         events (accept, sent, etc) that happen in the system.
- *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
- *         for the event. This is the default.
-*/
-#define TCP_MSS                         1460
-
-/**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
 #define TCP_MAXRTX                      6
-
 
 /**
  * TCP_SYNMAXRTX: Maximum number of retransmissions of SYN segments.
  */
 #define TCP_SYNMAXRTX                   3
+
+/**
+ * TCP_QUEUE_OOSEQ==1: TCP will queue segments that arrive out of order.
+ * Define to 0 if your device is low on memory.
+ */
+#define TCP_QUEUE_OOSEQ                 0
+
+/**
+ * TCP_MSS: TCP Maximum segment size. (default is 536, a conservative default,
+ * you might want to increase this.)
+ * For the receive side, this MSS is advertised to the remote side
+ * when opening a connection. For the transmit size, this MSS sets
+ * an upper limit on the MSS advertised by the remote host.
+ */
+#define TCP_MSS                         1460
 
 /*
    ----------------------------------
@@ -243,13 +252,17 @@
    ------------------------------------------------
 */
 /**
- * LWIP_NETIF_TX_SINGLE_PBUF: if this is set to 1, lwIP tries to put all data
+ * LWIP_NETIF_HOSTNAME==1: use DHCP_OPTION_HOSTNAME with netif's hostname
+ * field.
+ */
+#define LWIP_NETIF_HOSTNAME             1
+
+/**
+ * LWIP_NETIF_TX_SINGLE_PBUF: if this is set to 1, lwIP *tries* to put all data
  * to be sent into one single pbuf. This is for compatibility with DMA-enabled
  * MACs that do not support scatter-gather.
  * Beware that this might involve CPU-memcpy before transmitting that would not
  * be needed without this flag! Use this only if you need to!
- *
- * @todo: TCP and IP-frag do not work with this, yet:
  */
 #define LWIP_NETIF_TX_SINGLE_PBUF             1
 
@@ -358,6 +371,11 @@
    ----------------------------------------
 */
 
+/**
+ * LWIP_STATS_DISPLAY==1: Compile in the statistics output functions.
+ */
+#define LWIP_STATS_DISPLAY              1
+
 /*
    ---------------------------------
    ---------- PPP options ----------
@@ -392,9 +410,27 @@
 //#define LWIP_DEBUG
 
 /**
+ * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
+ * compared against this value. If it is smaller, then debugging
+ * messages are written.
+ */
+//#define LWIP_DBG_MIN_LEVEL              LWIP_DBG_LEVEL_WARNING
+
+/**
+ * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
+ * debug messages of certain types.
+ */
+#define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
+
+/**
  * ETHARP_DEBUG: Enable debugging in etharp.c.
  */
 #define ETHARP_DEBUG                    LWIP_DBG_OFF
+
+/**
+ * NETIF_DEBUG: Enable debugging in netif.c.
+ */
+#define NETIF_DEBUG                     LWIP_DBG_OFF
 
 /**
  * PBUF_DEBUG: Enable debugging in pbuf.c.
@@ -407,9 +443,29 @@
 #define API_LIB_DEBUG                   LWIP_DBG_OFF
 
 /**
+ * API_MSG_DEBUG: Enable debugging in api_msg.c.
+ */
+#define API_MSG_DEBUG                   LWIP_DBG_OFF
+
+/**
  * SOCKETS_DEBUG: Enable debugging in sockets.c.
  */
 #define SOCKETS_DEBUG                   LWIP_DBG_OFF
+
+/**
+ * ICMP_DEBUG: Enable debugging in icmp.c.
+ */
+#define ICMP_DEBUG                      LWIP_DBG_OFF
+
+/**
+ * IGMP_DEBUG: Enable debugging in igmp.c.
+ */
+#define IGMP_DEBUG                      LWIP_DBG_OFF
+
+/**
+ * INET_DEBUG: Enable debugging in inet.c.
+ */
+#define INET_DEBUG                      LWIP_DBG_OFF
 
 /**
  * IP_DEBUG: Enable debugging for IP.
@@ -417,9 +473,39 @@
 #define IP_DEBUG                        LWIP_DBG_OFF
 
 /**
+ * IP_REASS_DEBUG: Enable debugging in ip_frag.c for both frag & reass.
+ */
+#define IP_REASS_DEBUG                  LWIP_DBG_OFF
+
+/**
+ * RAW_DEBUG: Enable debugging in raw.c.
+ */
+#define RAW_DEBUG                       LWIP_DBG_OFF
+
+/**
+ * MEM_DEBUG: Enable debugging in mem.c.
+ */
+#define MEM_DEBUG                       LWIP_DBG_OFF
+
+/**
  * MEMP_DEBUG: Enable debugging in memp.c.
  */
 #define MEMP_DEBUG                      LWIP_DBG_OFF
+
+/**
+ * SYS_DEBUG: Enable debugging in sys.c.
+ */
+#define SYS_DEBUG                       LWIP_DBG_OFF
+
+/**
+ * TIMERS_DEBUG: Enable debugging in timers.c.
+ */
+#define TIMERS_DEBUG                    LWIP_DBG_OFF
+
+/**
+ * TCP_DEBUG: Enable debugging for TCP.
+ */
+#define TCP_DEBUG                       LWIP_DBG_OFF
 
 /**
  * TCP_INPUT_DEBUG: Enable debugging in tcp_in.c for incoming debug.
@@ -427,29 +513,80 @@
 #define TCP_INPUT_DEBUG                 LWIP_DBG_OFF
 
 /**
+ * TCP_FR_DEBUG: Enable debugging in tcp_in.c for fast retransmit.
+ */
+#define TCP_FR_DEBUG                    LWIP_DBG_OFF
+
+/**
+ * TCP_RTO_DEBUG: Enable debugging in TCP for retransmit
+ * timeout.
+ */
+#define TCP_RTO_DEBUG                   LWIP_DBG_OFF
+
+/**
+ * TCP_CWND_DEBUG: Enable debugging for TCP congestion window.
+ */
+#define TCP_CWND_DEBUG                  LWIP_DBG_OFF
+
+/**
+ * TCP_WND_DEBUG: Enable debugging in tcp_in.c for window updating.
+ */
+#define TCP_WND_DEBUG                   LWIP_DBG_OFF
+
+/**
  * TCP_OUTPUT_DEBUG: Enable debugging in tcp_out.c output functions.
  */
 #define TCP_OUTPUT_DEBUG                LWIP_DBG_OFF
 
 /**
- * UDP_DEBUG: Enable debugging in udp.c.
+ * TCP_RST_DEBUG: Enable debugging for TCP with the RST message.
  */
-#define UDP_DEBUG                     LWIP_DBG_OFF
+#define TCP_RST_DEBUG                   LWIP_DBG_OFF
 
 /**
- * ICMP_DEBUG: Enable debugging in udp.c.
+ * TCP_QLEN_DEBUG: Enable debugging for TCP queue lengths.
  */
-#define ICMP_DEBUG                     LWIP_DBG_OFF
+#define TCP_QLEN_DEBUG                  LWIP_DBG_OFF
+
+/**
+ * UDP_DEBUG: Enable debugging in UDP.
+ */
+#define UDP_DEBUG                       LWIP_DBG_OFF
 
 /**
  * TCPIP_DEBUG: Enable debugging in tcpip.c.
  */
 #define TCPIP_DEBUG                     LWIP_DBG_OFF
 
+/**
+ * SLIP_DEBUG: Enable debugging in slipif.c.
+ */
+#define SLIP_DEBUG                      LWIP_DBG_OFF
 
 /**
  * DHCP_DEBUG: Enable debugging in dhcp.c.
  */
 #define DHCP_DEBUG                      LWIP_DBG_OFF
+
+/**
+ * AUTOIP_DEBUG: Enable debugging in autoip.c.
+ */
+#define AUTOIP_DEBUG                    LWIP_DBG_OFF
+
+/**
+ * DNS_DEBUG: Enable debugging for DNS.
+ */
+#define DNS_DEBUG                       LWIP_DBG_OFF
+
+/**
+ * IP6_DEBUG: Enable debugging for IPv6.
+ */
+#define IP6_DEBUG                       LWIP_DBG_OFF
+
+/*
+   --------------------------------------------------
+   ---------- Performance tracking options ----------
+   --------------------------------------------------
+*/
 
 #endif /* __LWIPOPTS_H__ */

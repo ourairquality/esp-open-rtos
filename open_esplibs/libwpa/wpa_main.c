@@ -72,12 +72,12 @@ void sdk_dhcp_bind_check() {
 void sdk_eagle_auth_done() {
     struct sdk_g_ic_netif_info *netif_info = sdk_g_ic.v.station_netif_info;
     struct netif *netif = netif_info->netif;
-    struct sdk_netif_conninfo *conninfo = netif_info->_unknown88;
+    struct sdk_cnx_node *cnx_node = netif_info->_unknown88;
 
-    if (conninfo->_unknown08 & 1)
+    if (cnx_node->_unknown08 & 1)
         return;
 
-    uint32_t channel = conninfo->_unknown78->channel;
+    uint32_t channel = cnx_node->_unknown78->channel;
     char *ssid = (char *)sdk_g_ic.s._unknown1e4.sta_ssid;
     printf("\nconnected with %s, channel %d\n", ssid, channel);
 
@@ -89,15 +89,13 @@ void sdk_eagle_auth_done() {
     sdk_os_timer_arm(timer, 15000, 0);
 
     netif_info->statusb9 = 0;
-    conninfo->_unknown18 = 0;
-    conninfo->_unknown08 |= 1;
+    cnx_node->_unknown18 = 0;
+    cnx_node->_unknown08 |= 1;
 
-    // TODO lwip v2 removed the NETIF_FLAG_DHCP flag.
-    if (netif->flags & 0x08) // NETIF_FLAG_DHCP
+    if (dhcp_supplied_address(netif))
         return;
 
-    // lwip v2: if (ip4_addr_isany_val(netif->ip_addr)) {
-    if (netif->ip_addr.addr == 0) {
+    if (ip4_addr_isany_val(netif->ip_addr)) {
         if (sdk_dhcpc_flag != DHCP_STOPPED) {
             printf("dhcp client start...\n");
             dhcp_start(netif);

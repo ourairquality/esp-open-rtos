@@ -471,8 +471,7 @@ uint32_t sdk_system_relative_time(uint32_t reltime) {
     return WDEV.SYS_TIME - reltime;
 }
 
-// Change arg types to ip4_addr for lwip v2.
-void sdk_system_station_got_ip_set(struct ip_addr *ip, struct ip_addr *mask, struct ip_addr *gw) {
+void sdk_system_station_got_ip_set(struct ip4_addr *ip, struct ip4_addr *mask, struct ip4_addr *gw) {
     uint8_t *ip_bytes = (uint8_t *)&ip->addr;
     uint8_t *mask_bytes = (uint8_t *)&mask->addr;
     uint8_t *gw_bytes = (uint8_t *)&gw->addr;

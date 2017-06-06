@@ -22,7 +22,7 @@
 
 #define WEB_SERVER "chainxor.org"
 #define WEB_PORT 80
-#define WEB_URL "http://chainxor.org/"
+#define WEB_PATH "/"
 
 void http_get_task(void *pvParameters)
 {
@@ -75,7 +75,8 @@ void http_get_task(void *pvParameters)
         freeaddrinfo(res);
 
         const char *req =
-            "GET "WEB_URL"\r\n"
+            "GET "WEB_PATH" HTTP/1.1\r\n"
+            "Host: "WEB_SERVER"\r\n"
             "User-Agent: esp-open-rtos/0.1 esp8266\r\n"
             "\r\n";
         if (write(s, req, strlen(req)) < 0) {
@@ -126,6 +127,6 @@ void user_init(void)
     sdk_wifi_set_opmode(STATION_MODE);
     sdk_wifi_station_set_config(&config);
 
-    xTaskCreate(&http_get_task, "get_task", 256, NULL, 2, NULL);
+    xTaskCreate(&http_get_task, "get_task", 384, NULL, 2, NULL);
 }
 
