@@ -12,8 +12,26 @@
 #include <string.h>
 #include "lwip/dhcp.h"
 
-ETSTimer sdk_sta_con_timer;
-void *sdk_g_cnx_probe_rc_list_cb;
+/* Need to use the sdk versions of these as they follow static data and we need
+ * something to use to reference that static data! */
+extern ETSTimer sdk_sta_con_timer;
+extern void *sdk_g_cnx_probe_rc_list_cb;
+
+void *sdk_cnx_rc_search(uint8_t *hwaddr) {
+    /* Accessing static data, at a known offset from sdk_sta_con_timer? */
+    size_t len = *(uint8_t *)((void *)&sdk_sta_con_timer - 0xd7);
+    void **table = (void **)((void *)&sdk_sta_con_timer - 0xf0);
+    size_t i;
+
+    for (i = 0; i < len; i++) {
+        void *ptr = table[i];
+        if (ptr && memcmp(ptr, hwaddr, 6) == 0) {
+            return ptr;
+        }
+    }
+
+    return NULL;
+}
 
 #if 0
 
