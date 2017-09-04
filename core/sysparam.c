@@ -841,7 +841,7 @@ sysparam_status_t sysparam_set_data(const char *key, const uint8_t *value, size_
     struct sysparam_context ctx;
     struct sysparam_context write_ctx;
     sysparam_status_t status = SYSPARAM_OK;
-    uint16_t key_len = strlen(key);
+    size_t key_len = strlen(key);
     size_t free_space;
     size_t needed_space;
     int key_id = -1;
