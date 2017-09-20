@@ -129,10 +129,10 @@ bool bmp180_fillInternalConstants(i2c_dev_t *dev, bmp180_constants_t *c)
              c->AC4 == 0x0000 || c->AC5 == 0x0000 || c->AC6 == 0x0000 ||
              c->B1 == 0x0000 || c->B2 == 0x0000 ||
              c->MB == 0x0000 || c->MC == 0x0000 || c->MD == 0x0000 ||
-             c->AC1 == 0xffff || c->AC2 == 0xffff || c->AC3 == 0xffff ||
+             c->AC1 == -1 || c->AC2 == -1 || c->AC3 == -1 ||
              c->AC4 == 0xffff || c->AC5 == 0xffff || c->AC6 == 0xffff ||
-             c->B1 == 0xffff || c->B2 == 0xffff ||
-             c->MB == 0xffff || c->MC == 0xffff || c->MD == 0xffff);
+             c->B1 == -1 || c->B2 == -1 ||
+             c->MB == -1 || c->MC == -1 || c->MD == -1);
 }
 
 bool bmp180_is_available(i2c_dev_t *dev)
