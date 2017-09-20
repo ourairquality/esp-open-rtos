@@ -1190,19 +1190,19 @@ static int handle_wifi_ap_post(int s, wificfg_method method,
             }
             case FORM_NAME_AP_AUTHMODE: {
                 uint32_t mode = strtoul(buf, NULL, 10);
-                if (mode >= 0 && mode <= 5)
+                if (mode <= 5)
                     sysparam_set_int8("wifi_ap_authmode", mode);
                 break;
             }
             case FORM_NAME_AP_MAX_CONN: {
                 uint32_t max_conn = strtoul(buf, NULL, 10);
-                if (max_conn >= 0 && max_conn <= 8)
+                if (max_conn <= 8)
                     sysparam_set_int8("wifi_ap_max_conn", max_conn);
                 break;
             }
             case FORM_NAME_AP_BEACON_INTERVAL: {
                 uint32_t interval = strtoul(buf, NULL, 10);
-                if (interval >= 0 && interval <= 10000)
+                if (interval <= 10000)
                     sysparam_set_int32("wifi_ap_beacon_interval", interval);
                 break;
             }
@@ -1214,7 +1214,7 @@ static int handle_wifi_ap_post(int s, wificfg_method method,
                 break;
             case FORM_NAME_AP_DHCP_LEASES: {
                 uint32_t leases = strtoul(buf, NULL, 10);
-                if (leases >= 0 && leases <= 16)
+                if (leases <= 16)
                     sysparam_set_int8("wifi_ap_dhcp_leases", leases);
                 break;
             }
