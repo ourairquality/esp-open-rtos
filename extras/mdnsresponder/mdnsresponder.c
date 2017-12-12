@@ -627,7 +627,8 @@ static void mdns_send_mcast(const ip_addr_t *addr, u8_t* msgP, int nBytes)
         } else {
             dest_addr = &gMulticastV4Addr;
         }
-        err = udp_sendto(gMDNS_pcb, p, dest_addr, LWIP_IANA_PORT_MDNS);
+        struct netif *netif = ip_current_input_netif();
+        err = udp_sendto_if(gMDNS_pcb, p, dest_addr, LWIP_IANA_PORT_MDNS, netif);
         if (err == ERR_OK) {
 #ifdef qDebugLog
             printf(" - responded with %d bytes err %d\n", nBytes, err);
@@ -804,20 +805,65 @@ void mdns_init()
 {
     err_t err;
 
-    struct netif *netif = sdk_system_get_netif(STATION_IF);
-    if (netif == NULL) {
-        printf(">>> mDNS_init: wifi opmode not station\n");
-        return;
-    }
+    struct netif *station_netif = sdk_system_get_netif(STATION_IF);
 
-    // Start IGMP on the netif for our interface: this isn't done for us
-    if (!(netif->flags & NETIF_FLAG_IGMP)) {
-        netif->flags |= NETIF_FLAG_IGMP;
-        err = igmp_start(netif);
-        if (err != ERR_OK) {
-            printf(">>> mDNS_init: igmp_start on %c%c failed %d\n", netif->name[0], netif->name[1],err);
+    if (station_netif) {
+        // Start IGMP on the netif for our interface: this isn't done for us
+        if (!(station_netif->flags & NETIF_FLAG_IGMP)) {
+            station_netif->flags |= NETIF_FLAG_IGMP;
+            err = igmp_start(station_netif);
+            if (err != ERR_OK) {
+                printf(">>> mDNS_init: igmp_start on %c%c failed %d\n", station_netif->name[0], station_netif->name[1],err);
+                return;
+            }
+        }
+
+        if ((err = igmp_joingroup_netif(station_netif, ip_2_ip4(&gMulticastV4Addr))) != ERR_OK) {
+            printf(">>> mDNS_init: igmp_join failed %d\n",err);
             return;
         }
+
+#if LWIP_IPV6
+        if ((err = mld6_joingroup_netif(station_netif, ip_2_ip6(&gMulticastV6Addr))) != ERR_OK) {
+            printf(">>> mDNS_init: igmp_join failed %d\n",err);
+            return;
+        }
+#endif
+    }
+
+    struct netif *softap_netif = sdk_system_get_netif(SOFTAP_IF);
+    if (softap_netif) {
+        if (softap_netif == NULL) {
+            printf(">>> mDNS_init: wifi opmode not softap\n");
+            return;
+        }
+
+        // Start IGMP on the netif for our interface: this isn't done for us
+        if (!(softap_netif->flags & NETIF_FLAG_IGMP)) {
+            softap_netif->flags |= NETIF_FLAG_IGMP;
+            err = igmp_start(softap_netif);
+            if (err != ERR_OK) {
+                printf(">>> mDNS_init: igmp_start on %c%c failed %d\n", softap_netif->name[0], softap_netif->name[1],err);
+                return;
+            }
+        }
+
+        if ((err = igmp_joingroup_netif(softap_netif, ip_2_ip4(&gMulticastV4Addr))) != ERR_OK) {
+            printf(">>> mDNS_init: igmp_join failed %d\n",err);
+            return;
+        }
+
+#if LWIP_IPV6
+        if ((err = mld6_joingroup_netif(softap_netif, ip_2_ip6(&gMulticastV6Addr))) != ERR_OK) {
+            printf(">>> mDNS_init: igmp_join failed %d\n",err);
+            return;
+        }
+#endif
+    }
+
+    if (station_netif == NULL && softap_netif == NULL) {
+        printf(">>> mDNS_init: wifi opmode none\n");
+        return;
     }
 
     gMDNS_pcb = udp_new_ip_type(IPADDR_TYPE_ANY);
@@ -826,24 +872,10 @@ void mdns_init()
         return;
     }
 
-    if ((err = igmp_joingroup_netif(netif, ip_2_ip4(&gMulticastV4Addr))) != ERR_OK) {
-        printf(">>> mDNS_init: igmp_join failed %d\n",err);
-        return;
-    }
-
-#if LWIP_IPV6
-    if ((err = mld6_joingroup_netif(netif, ip_2_ip6(&gMulticastV6Addr))) != ERR_OK) {
-        printf(">>> mDNS_init: igmp_join failed %d\n",err);
-        return;
-    }
-#endif
-
     if ((err = udp_bind(gMDNS_pcb, IP_ANY_TYPE, LWIP_IANA_PORT_MDNS)) != ERR_OK) {
         printf(">>> mDNS_init: udp_bind failed %d\n",err);
         return;
     }
-
-    udp_bind_netif(gMDNS_pcb, netif);
 
     udp_recv(gMDNS_pcb, mdns_recv, NULL);
 }
