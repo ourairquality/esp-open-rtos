@@ -20,6 +20,13 @@ __BEGIN_DECLS
 
 void _arc4random_getentropy_fail(void);
 
+#define _ARC4RANDOM_DATA
+
 #define _ARC4RANDOM_GETENTROPY_FAIL() _arc4random_getentropy_fail()
+
+#define _ARC4RANDOM_ALLOCATE(rsp, rsxp)  \
+  do { *rsp = malloc(sizeof(**rsp));     \
+       *rsxp = malloc(sizeof(**rsxp)); } \
+  while (0)
 
 __END_DECLS
