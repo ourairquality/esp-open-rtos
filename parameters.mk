@@ -86,7 +86,7 @@ SPLIT_SECTIONS ?= 1
 WARNINGS_AS_ERRORS ?= 0
 
 # Common flags for both C & C++_
-C_CXX_FLAGS ?= -Wtype-limits -Wall -Wl,-EL -nostdlib $(EXTRA_C_CXX_FLAGS)
+C_CXX_FLAGS ?= -Wtype-limits -Wwrite-strings -Wall -Wl,-EL -nostdlib $(EXTRA_C_CXX_FLAGS)
 # Flags for C only
 CFLAGS		?= $(C_CXX_FLAGS) -std=gnu99 $(EXTRA_CFLAGS)
 # Flags for C++ only
