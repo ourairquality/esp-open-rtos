@@ -104,4 +104,7 @@ typedef int sys_prot_t;
 
 #define LWIP_RAND()                         hwrand()
 
+/* Newlib includes this definition so use it. */
+#define lwip_strnstr(buffer, token, n) strnstr(buffer, token, n)
+
 #endif /* __ARCH_CC_H__ */
