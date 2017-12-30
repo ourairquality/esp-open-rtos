@@ -15,6 +15,7 @@
 #include "esplibs/libwpa.h"
 #include "esplibs/libpp.h"
 #include "lwip/dhcp.h"
+#include "lwip/netifapi.h"
 #include "esp/rtcmem_regs.h"
 
 static void wpa_callback1(struct pbuf* pb) {
@@ -97,8 +98,8 @@ void sdk_eagle_auth_done() {
 
     if (sdk_dhcpc_flag != DHCP_STOPPED) {
         printf("dhcp client start...\n");
-        netif_set_up(netif);
-        dhcp_start(netif);
+        netifapi_netif_set_up(netif);
+        netifapi_dhcp_start(netif);
         return;
     }
 
@@ -107,8 +108,8 @@ void sdk_eagle_auth_done() {
         return;
     }
 
-    netif_set_addr(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask, &sdk_info.sta_gw);
-    netif_set_up(netif);
+    netifapi_netif_set_addr(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask, &sdk_info.sta_gw);
+    netifapi_netif_set_up(netif);
     sdk_system_station_got_ip_set(ip_2_ip4(&netif->ip_addr),
                                   ip_2_ip4(&netif->netmask),
                                   ip_2_ip4(&netif->gw));

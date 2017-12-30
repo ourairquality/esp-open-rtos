@@ -11,6 +11,7 @@
 #include "esplibs/libwpa.h"
 #include "tcpip.h"
 #include "espressif/esp_sta.h"
+#include "lwip/netifapi.h"
 
 
 void sdk_sta_status_set(int status) {
@@ -42,7 +43,8 @@ bool sdk_wifi_station_start() {
             struct netif *netif = (struct netif *)malloc(sizeof(struct netif));
             netif_info->netif = netif;
             memcpy(&netif->hwaddr, &sdk_info.sta_mac_addr, 6);
-            netif_add(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask, &sdk_info.sta_gw, netif_info, ethernetif_init, tcpip_input);
+            netifapi_netif_add(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask,
+                               &sdk_info.sta_gw, netif_info, ethernetif_init, tcpip_input);
             sdk_wpa_attach(&sdk_g_ic);
         }
         sdk_ic_set_vif(0, 1, &sdk_info.sta_mac_addr, 0, 0);

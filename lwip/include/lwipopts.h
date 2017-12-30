@@ -484,6 +484,19 @@
 #endif
 
 /**
+ * LWIP_NETIF_API==1: Support netif api (in netifapi.c)
+ */
+#define LWIP_NETIF_API                  1
+
+/**
+ * LWIP_NETIF_STATUS_CALLBACK==1: Support a callback function whenever an interface
+ * changes its up/down status (i.e., due to DHCP IP acquisition)
+ */
+#ifndef LWIP_NETIF_STATUS_CALLBACK
+#define LWIP_NETIF_STATUS_CALLBACK      0
+#endif
+
+/**
  * LWIP_NETIF_TX_SINGLE_PBUF: if this is set to 1, lwIP *tries* to put all data
  * to be sent into one single pbuf. This is for compatibility with DMA-enabled
  * MACs that do not support scatter-gather.
@@ -854,6 +867,11 @@
  * IP6_DEBUG: Enable debugging for IPv6.
  */
 #define IP6_DEBUG                       LWIP_DBG_OFF
+
+/**
+ * MDNS_DEBUG: Enable debugging for multicast DNS.
+ */
+#define MDNS_DEBUG                      LWIP_DBG_OFF
 
 /*
    --------------------------------------------------

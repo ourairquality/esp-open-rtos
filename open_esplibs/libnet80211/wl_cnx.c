@@ -10,6 +10,7 @@
 #include "esplibs/libwpa.h"
 #include <string.h>
 #include "lwip/dhcp.h"
+#include "lwip/netifapi.h"
 
 /* Need to use the sdk versions of these for now as there are reference to them
  * relative to other data structres. */
@@ -24,8 +25,8 @@ extern void *sdk_g_cnx_probe_rc_list_cb;
  */
 void dhcp_if_down(struct netif *netif)
 {
-    dhcp_release_and_stop(netif);
-    netif_set_down(netif);
+    netifapi_dhcp_release_and_stop(netif);
+    netifapi_netif_set_down(netif);
 }
 
 struct sdk_cnx_node *sdk_cnx_rc_search(uint8_t *hwaddr) {

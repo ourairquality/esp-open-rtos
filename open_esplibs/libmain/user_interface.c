@@ -9,6 +9,7 @@
 #include "string.h"
 
 #include "lwip/dhcp.h"
+#include "lwip/netifapi.h"
 
 #include "esp/types.h"
 #include "esp/rom.h"
@@ -546,8 +547,8 @@ bool sdk_wifi_station_dhcpc_start(void) {
         sdk_info.sta_ipaddr.addr = 0;
         sdk_info.sta_netmask.addr = 0;
         sdk_info.sta_gw.addr = 0;
-        netif_set_addr(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask, &sdk_info.sta_gw);
-        if (dhcp_start(netif)) {
+        netifapi_netif_set_addr(netif, &sdk_info.sta_ipaddr, &sdk_info.sta_netmask, &sdk_info.sta_gw);
+        if (netifapi_dhcp_start(netif)) {
             return false;
         }
     }
@@ -561,7 +562,7 @@ bool sdk_wifi_station_dhcpc_stop(void) {
         return false;
     }
     if (netif && sdk_dhcpc_flag == DHCP_STARTED) {
-        dhcp_stop(netif);
+        netifapi_dhcp_stop(netif);
     }
     sdk_dhcpc_flag = DHCP_STOPPED;
     return true;
@@ -617,7 +618,7 @@ bool sdk_wifi_set_ip_info(uint8_t if_index, struct ip_info *info) {
 
     struct netif *netif = _get_netif(if_index);
     if (netif)
-        netif_set_addr(netif, &info->ip, &info->netmask, &info->gw);
+        netifapi_netif_set_addr(netif, &info->ip, &info->netmask, &info->gw);
 
     return true;
 }
