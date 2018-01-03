@@ -12,7 +12,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <lwip/tcpip.h>
-#include <lwip/netifapi.h>
 
 #include "common_macros.h"
 #include "xtensa_ops.h"
@@ -374,16 +373,22 @@ void sdk_user_init_task(void *params) {
     sdk_wifi_mode_set(sdk_g_ic.s.wifi_mode);
     if (sdk_g_ic.s.wifi_mode == STATION_MODE) {
         sdk_wifi_station_start();
-        netifapi_netif_set_default(sdk_g_ic.v.station_netif_info->netif);
+        LOCK_TCPIP_CORE();
+        netif_set_default(sdk_g_ic.v.station_netif_info->netif);
+        UNLOCK_TCPIP_CORE();
     }
     if (sdk_g_ic.s.wifi_mode == SOFTAP_MODE) {
         sdk_wifi_softap_start();
-        netifapi_netif_set_default(sdk_g_ic.v.softap_netif_info->netif);
+        LOCK_TCPIP_CORE();
+        netif_set_default(sdk_g_ic.v.softap_netif_info->netif);
+        UNLOCK_TCPIP_CORE();
     }
     if (sdk_g_ic.s.wifi_mode == STATIONAP_MODE) {
         sdk_wifi_station_start();
         sdk_wifi_softap_start();
-        netifapi_netif_set_default(sdk_g_ic.v.station_netif_info->netif);
+        LOCK_TCPIP_CORE();
+        netif_set_default(sdk_g_ic.v.station_netif_info->netif);
+        UNLOCK_TCPIP_CORE();
     }
     if (sdk_wifi_station_get_auto_connect()) {
         sdk_wifi_station_connect();
