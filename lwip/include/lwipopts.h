@@ -574,7 +574,7 @@ void sys_unlock_tcpip_core(void);
  * sys_thread_new() when the thread is created.
  */
 #ifndef TCPIP_THREAD_STACKSIZE
-#define TCPIP_THREAD_STACKSIZE          768
+#define TCPIP_THREAD_STACKSIZE          480
 #endif
 
 /**
