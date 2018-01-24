@@ -1701,14 +1701,18 @@ static void server_task(void *pvParameters)
 #if LWIP_MDNS_RESPONDER
         LOCK_TCPIP_CORE();
         if (wifi_sta_mdns && station_netif) {
+            LOCK_TCPIP_CORE();
             mdns_resp_add_netif(station_netif, hostname, 120);
             mdns_resp_add_service(station_netif, hostname, "_http",
                                   DNSSD_PROTO_TCP, 80, 3600, NULL, NULL);
+            UNLOCK_TCPIP_CORE();
         }
         if (wifi_ap_mdns && softap_netif) {
+            LOCK_TCPIP_CORE();
             mdns_resp_add_netif(softap_netif, hostname, 120);
             mdns_resp_add_service(softap_netif, hostname, "_http",
                                   DNSSD_PROTO_TCP, 80, 3600, NULL, NULL);
+            UNLOCK_TCPIP_CORE();
         }
         UNLOCK_TCPIP_CORE();
 #endif
