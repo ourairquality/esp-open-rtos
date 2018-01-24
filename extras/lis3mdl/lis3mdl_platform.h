@@ -1,6 +1,5 @@
-/*
- * Driver for Bosch Sensortec BME680 digital temperature, humidity, pressure
- * and gas sensor connected to I2C or SPI
+/**
+ * Driver for LIS3MDL 3-axes digital magnetometer to I2C or SPI.
  *
  * This driver is for the usage with the ESP8266 and FreeRTOS (esp-open-rtos)
  * [https://github.com/SuperHouse/esp-open-rtos]. It is also working with ESP32
@@ -44,9 +43,9 @@
 /**
  * Platform file: platform specific definitions, includes and functions
  */
-
-#ifndef __BME680_PLATFORM_H__
-#define __BME680_PLATFORM_H__
+ 
+#ifndef __LIS3MDL_PLATFORM_H__
+#define __LIS3MDL_PLATFORM_H__
 
 #if !defined(ESP_OPEN_RTOS)
 #define ESP_OPEN_RTOS 1
@@ -58,6 +57,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 #include "espressif/esp_common.h"
 #include "espressif/sdk_private.h"
@@ -77,4 +77,4 @@ extern size_t spi_transfer_pf (uint8_t bus, uint8_t cs,
 
 #endif // ESP_OPEN_RTOS
 
-#endif // __BME680_PLATFORM_H__
+#endif // __LIS3MDL_PLATFORM_H__
