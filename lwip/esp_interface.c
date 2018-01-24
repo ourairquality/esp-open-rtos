@@ -339,7 +339,7 @@ struct pbuf *sdk_pbuf_alloc(pbuf_layer layer, u16_t length, pbuf_type type) {
  * network interface. It calls the function low_level_init() to do the
  * actual setup of the hardware.
  *
- * This function should be passed as a parameter to netifapi_netif_add().
+ * This function should be passed as a parameter to netif_add().
  *
  * @param netif the lwip network interface structure for this ethernetif
  * @return ERR_OK if the loopif is initialized

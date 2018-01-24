@@ -2237,10 +2237,6 @@ void wificfg_init(uint32_t port, const wificfg_dispatch *dispatch)
         params->dispatch = dispatch;
 
         size_t stack_size = 464;
-#if LWIP_MDNS_RESPONDER
-        /* Uses a lot of stack space, so allocate extra. */
-        stack_size += 128;
-#endif
         xTaskCreate(server_task, "WiFi Cfg HTTP", stack_size, params, 2, NULL);
     }
 }
