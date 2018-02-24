@@ -34,6 +34,9 @@
 [submodule "extras/libesphttpd/libesphttpd/lib/heatshrink"]
 	path = extras/libesphttpd/libesphttpd/lib/heatshrink
 	url = https://github.com/atomicobject/heatshrink
+[submodule "extras/multipwm"]
+	path = extras/multipwm
+	url = https://github.com/nochkin/multipwm
 [submodule "examples/oaq"]
 	path = examples/oaq
 	url = https://github.com/ourairquality/oaq-esp-open-rtos.git
