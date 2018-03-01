@@ -1,4 +1,4 @@
-Newlib from git://sourceware.org/git/newlib-cygwin.git with xtensa & locking patches see https://github.com/ourairquality/newlib and built from commit 984b749fb223daab954060c04720933290584f00
+Newlib from git://sourceware.org/git/newlib-cygwin.git with xtensa & locking patches see https://github.com/ourairquality/newlib and built from commit 8eaccaa1e840de60501a1e5b79045cd7c1683789
 
 The build commands were:
 
