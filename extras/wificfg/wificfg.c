@@ -2070,11 +2070,6 @@ void wificfg_init(uint32_t port, const wificfg_dispatch *dispatch)
         return;
     }
 
-    sysparam_get_string("wificfg", "ap_ssid", &wifi_ap_ssid);
-    sysparam_get_string("wificfg", "ap_password", &wifi_ap_password);
-    sysparam_get_string("wificfg", "sta_ssid", &wifi_sta_ssid);
-    sysparam_get_string("wificfg", "sta_password", &wifi_sta_password);
-
     /* Default a hostname. */
     char *hostname = NULL;
     sysparam_get_string("wificfg", "hostname", &hostname);
@@ -2089,6 +2084,11 @@ void wificfg_init(uint32_t port, const wificfg_dispatch *dispatch)
     if (hostname) {
         free(hostname);
     }
+
+    sysparam_get_string("wifi_ap_ssid", &wifi_ap_ssid);
+    sysparam_get_string("wifi_ap_password", &wifi_ap_password);
+    sysparam_get_string("wifi_sta_ssid", &wifi_sta_ssid);
+    sysparam_get_string("wifi_sta_password", &wifi_sta_password);
 
     int8_t wifi_sta_enable = 1;
     int8_t wifi_ap_enable = 1;
