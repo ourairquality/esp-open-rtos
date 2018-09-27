@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.0.1
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.1.1
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -67,6 +67,7 @@ only for ports that are using the MPU. */
 		#define pcTaskGetName							MPU_pcTaskGetName
 		#define xTaskGetHandle							MPU_xTaskGetHandle
 		#define uxTaskGetStackHighWaterMark				MPU_uxTaskGetStackHighWaterMark
+		#define uxTaskGetStackHighWaterMark2			MPU_uxTaskGetStackHighWaterMark2
 		#define vTaskSetApplicationTaskTag				MPU_vTaskSetApplicationTaskTag
 		#define xTaskGetApplicationTaskTag				MPU_xTaskGetApplicationTaskTag
 		#define vTaskSetThreadLocalStoragePointer		MPU_vTaskSetThreadLocalStoragePointer
@@ -76,6 +77,7 @@ only for ports that are using the MPU. */
 		#define uxTaskGetSystemState					MPU_uxTaskGetSystemState
 		#define vTaskList								MPU_vTaskList
 		#define vTaskGetRunTimeStats					MPU_vTaskGetRunTimeStats
+		#define xTaskGetIdleRunTimeCounter				MPU_xTaskGetIdleRunTimeCounter
 		#define xTaskGenericNotify						MPU_xTaskGenericNotify
 		#define xTaskNotifyWait							MPU_xTaskNotifyWait
 		#define ulTaskNotifyTake						MPU_ulTaskNotifyTake
@@ -124,6 +126,7 @@ only for ports that are using the MPU. */
 		#define xTimerGetTimerDaemonTaskHandle			MPU_xTimerGetTimerDaemonTaskHandle
 		#define xTimerPendFunctionCall					MPU_xTimerPendFunctionCall
 		#define pcTimerGetName							MPU_pcTimerGetName
+		#define vTimerSetReloadMode						MPU_vTimerSetReloadMode
 		#define xTimerGetPeriod							MPU_xTimerGetPeriod
 		#define xTimerGetExpiryTime						MPU_xTimerGetExpiryTime
 		#define xTimerGenericCommand					MPU_xTimerGenericCommand
@@ -140,10 +143,8 @@ only for ports that are using the MPU. */
 		/* Map standard message/stream_buffer.h API functions to the MPU
 		equivalents. */
 		#define xStreamBufferSend						MPU_xStreamBufferSend
-		#define xStreamBufferSendFromISR				MPU_xStreamBufferSendFromISR
 		#define xStreamBufferReceive					MPU_xStreamBufferReceive
 		#define xStreamBufferNextMessageLengthBytes		MPU_xStreamBufferNextMessageLengthBytes
-		#define xStreamBufferReceiveFromISR				MPU_xStreamBufferReceiveFromISR
 		#define vStreamBufferDelete						MPU_vStreamBufferDelete
 		#define xStreamBufferIsFull						MPU_xStreamBufferIsFull
 		#define xStreamBufferIsEmpty					MPU_xStreamBufferIsEmpty
