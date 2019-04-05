@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.0.0
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -172,7 +172,7 @@ portBASE_TYPE xPortStartScheduler( void )
     return pdTRUE;
 }
 
-/* Determine free heap size via mallinfo
+/* Determine free heap size.
 
    mallinfo.fordblks gives free space inside area dedicated to heap.
 
@@ -182,7 +182,19 @@ portBASE_TYPE xPortStartScheduler( void )
 size_t xPortGetFreeHeapSize( void )
 {
     struct mallinfo mi = mallinfo();
+#if portMALLOC_REGIONS
     return mi.fordblks;
+#else
+    /* Via libc sbrk function & mallinfo, sbrk gives total size in totally
+     * unallocated memory. */
+    uint32_t brk_val = (uint32_t) sbrk(0);
+    intptr_t sp = (intptr_t)xPortSupervisorStackPointer;
+    if (sp == 0) {
+        /* scheduler not started */
+        SP(sp);
+    }
+    return sp - brk_val + mi.fordblks;
+#endif
 }
 
 void vPortEndScheduler( void )

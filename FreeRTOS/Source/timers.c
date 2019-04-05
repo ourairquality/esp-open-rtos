@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.1.1
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -301,7 +301,7 @@ BaseType_t xReturn = pdFAIL;
 		return pxNewTimer;
 	}
 
-#endif /* configSUPPORT_STATIC_ALLOCATION */
+#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 /*-----------------------------------------------------------*/
 
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
@@ -768,9 +768,9 @@ TickType_t xTimeNow;
 			switch( xMessage.xMessageID )
 			{
 				case tmrCOMMAND_START :
-			    case tmrCOMMAND_START_FROM_ISR :
-			    case tmrCOMMAND_RESET :
-			    case tmrCOMMAND_RESET_FROM_ISR :
+				case tmrCOMMAND_START_FROM_ISR :
+				case tmrCOMMAND_RESET :
+				case tmrCOMMAND_RESET_FROM_ISR :
 				case tmrCOMMAND_START_DONT_TRACE :
 					/* Start or restart a timer. */
 					pxTimer->ucStatus |= tmrSTATUS_IS_ACTIVE;
@@ -820,17 +820,29 @@ TickType_t xTimeNow;
 					break;
 
 				case tmrCOMMAND_DELETE :
-					/* The timer has already been removed from the active list,
-					just free up the memory if the memory was dynamically
-					allocated. */
-					if( ( pxTimer->ucStatus & tmrSTATUS_IS_STATICALLY_ALLOCATED ) == ( uint8_t ) 0 )
+					#if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 					{
-						vPortFree( pxTimer );
+						/* The timer has already been removed from the active list,
+						just free up the memory if the memory was dynamically
+						allocated. */
+						if( ( pxTimer->ucStatus & tmrSTATUS_IS_STATICALLY_ALLOCATED ) == ( uint8_t ) 0 )
+						{
+							vPortFree( pxTimer );
+						}
+						else
+						{
+							pxTimer->ucStatus &= ~tmrSTATUS_IS_ACTIVE;
+						}
 					}
-					else
+					#else
 					{
+						/* If dynamic allocation is not enabled, the memory
+						could not have been dynamically allocated. So there is
+						no need to free the memory - just mark the timer as
+						"not active". */
 						pxTimer->ucStatus &= ~tmrSTATUS_IS_ACTIVE;
 					}
+					#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 					break;
 
 				default	:

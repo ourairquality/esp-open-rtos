@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.1.1
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -43,10 +43,18 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V10.1.1"
+#define tskKERNEL_VERSION_NUMBER "V10.2.0"
 #define tskKERNEL_VERSION_MAJOR 10
-#define tskKERNEL_VERSION_MINOR 1
-#define tskKERNEL_VERSION_BUILD 1
+#define tskKERNEL_VERSION_MINOR 2
+#define tskKERNEL_VERSION_BUILD 0
+
+/* MPU region parameters passed in ulParameters
+ * of MemoryRegion_t struct. */
+#define tskMPU_REGION_READ_ONLY			( 1UL << 0UL )
+#define tskMPU_REGION_READ_WRITE		( 1UL << 1UL )
+#define tskMPU_REGION_EXECUTE_NEVER		( 1UL << 2UL )
+#define tskMPU_REGION_NORMAL_MEMORY		( 1UL << 3UL )
+#define tskMPU_REGION_DEVICE_MEMORY		( 1UL << 4UL )
 
 /**
  * task. h
@@ -114,7 +122,7 @@ typedef struct xTASK_PARAMETERS
 {
 	TaskFunction_t pvTaskCode;
 	const char * const pcName;	/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-	uint16_t usStackDepth;
+	configSTACK_DEPTH_TYPE usStackDepth;
 	void *pvParameters;
 	UBaseType_t uxPriority;
 	StackType_t *puxStackBuffer;
