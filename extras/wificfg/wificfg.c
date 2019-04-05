@@ -1600,7 +1600,7 @@ static int handle_tasks(int s, wificfg_method method,
                 default: cStatus = '?'; break;
                 }
 
-                snprintf(buf, len, "<tr><th>%s</th>", task_status[i].pcTaskName);
+                snprintf(buf, len, "<tr align=\"right\"><th>%s</th>", task_status[i].pcTaskName);
                 if (wificfg_write_string_chunk(s, buf, buf, len) < 0) {
                     free(task_status);
                     return -1;
