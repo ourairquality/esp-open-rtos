@@ -102,4 +102,6 @@ typedef int sys_prot_t;
 /* Newlib includes this definition so use it. */
 #define lwip_strnstr(buffer, token, n) strnstr(buffer, token, n)
 
+#define MALLOC_REGIONS 1
+
 #endif /* __ARCH_CC_H__ */
