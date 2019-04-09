@@ -144,7 +144,7 @@ static IRAM void mactimer_handler()
             /* Nothing remaining to handle now. */
             break;
         }
-            
+
         mactimer_t *timer = timer_list;
         timer_list = timer->next;
         timer->next = NULL;
