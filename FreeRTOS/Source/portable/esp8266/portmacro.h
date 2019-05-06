@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.2.0
+ * FreeRTOS Kernel V10.2.1
  * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -158,6 +158,12 @@ not necessary for to use this port.  They are defined so the common demo files
 /* FreeRTOS API functions should not be called from the NMI handler. */
 #define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() configASSERT(sdk_NMIIrqIsOn == 0)
 
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Barriers.
+ */
+#define portMEMORY_BARRIER() __asm volatile( "" ::: "memory" )
 /*-----------------------------------------------------------*/
 
 #ifdef __cplusplus
